@@ -33,6 +33,10 @@ public class Ticket {
         return ticketID;
     }
 
+    protected String getDescription() {
+        return description;
+    }
+
     public String toString(){
         return("ID= " + this.ticketID + " Issued: " + this.description + " Priority: " + 					this.priority + " Reported by: "
                 + this.reporter + " Reported on: " + this.dateReported);
