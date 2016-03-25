@@ -8,6 +8,8 @@ public class Ticket {
     private String reporter; //Stores person or department who reported issue
     private String description;
     private Date dateReported;
+    private String resolution;
+    private Date dateResolved;
 
     //STATIC Counter - accessible to all Ticket objects.
     //If any Ticket object modifies this counter, all Ticket objects will have the modified value
@@ -21,8 +23,17 @@ public class Ticket {
         this.priority = p;
         this.reporter = rep;
         this.dateReported = date;
+        this.resolution = "unresolved";
         this.ticketID = staticTicketIDCounter;
         staticTicketIDCounter++;
+    }
+
+    protected void setResolution(String resolution) {
+        this.resolution = resolution;
+    }
+
+    protected void setDateResolved(Date dateResolved) {
+        this.dateResolved = dateResolved;
     }
 
     protected int getPriority() {
@@ -37,9 +48,23 @@ public class Ticket {
         return description;
     }
 
+    protected String getReporter() {
+        return reporter;
+    }
+
+    protected Date getDateReported() {
+        return dateReported;
+    }
+
     public String toString(){
-        return("ID= " + this.ticketID + " Issued: " + this.description + " Priority: " + 					this.priority + " Reported by: "
-                + this.reporter + " Reported on: " + this.dateReported);
+        String printStr = "ID= " + this.ticketID + " | Issued: " + this.description + " | Priority: " + this.priority + " | Reported by: "
+                + this.reporter + " | Reported on: " + this.dateReported;
+
+        if (!this.resolution.equalsIgnoreCase("unresolved")) {
+            printStr += " | Resolution: " + this.resolution + " | Resolved on: " + this.dateResolved;
+        }
+
+        return printStr;
     }
 
 

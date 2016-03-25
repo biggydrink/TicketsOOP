@@ -8,9 +8,24 @@ public class TicketManager {
 
     public static void main(String[] args) {
 
-        LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
+        LinkedList<Ticket> ticketQueue = new LinkedList<>();
+        LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
         scanner = new Scanner(System.in);
+
+        Ticket ticket1 = new Ticket("Big Fire!",5,"Andrew",new Date());
+        Ticket ticket2 = new Ticket("Small fire",3,"Andrew",new Date());
+        Ticket ticket3 = new Ticket("Tiny fire",1,"Andrew",new Date());
+        Ticket ticket4 = new Ticket("Water balloon!",5,"Andrew",new Date());
+        Ticket ticket5 = new Ticket("Squirt gun (water)",2,"Andrew",new Date());
+        Ticket ticket6 = new Ticket("Spilled drink (water)",4,"Andrew",new Date());
+
+        ticketQueue.add(ticket1);
+        ticketQueue.add(ticket2);
+        ticketQueue.add(ticket3);
+        ticketQueue.add(ticket4);
+        ticketQueue.add(ticket5);
+        ticketQueue.add(ticket6);
 
         while(true){
 
@@ -18,74 +33,68 @@ public class TicketManager {
             int task = getPositiveIntInput();
 
             if (task == 1) {
-                //Call addTickets, which will let us enter any number of new tickets
+                // Call addTickets, which will let us enter any number of new tickets
                 addTickets(ticketQueue);
 
             } else if (task == 2) {
-                //delete a ticket
-                deleteTicketByID(ticketQueue);
+                // Delete a ticket by ID
+                deleteTicketByID(ticketQueue,resolvedTickets);
             } else if (task == 3) {
-                LinkedList<Ticket> results = new LinkedList<Ticket>();
-
+                // Delete a ticket by issue (search, then show results and option to delete)
+                LinkedList<Ticket> results;
                 results = searchByName(ticketQueue);
 
-                deleteTicketByID(results);
+                deleteTicketByID(results,resolvedTickets);
             } else if (task == 4) {
-                LinkedList<Ticket> results = new LinkedList<Ticket>();
-
+                // Search descriptions of tickets
+                LinkedList<Ticket> results;
                 results = searchByName(ticketQueue);
+
                 if (results.isEmpty()) {
                     System.out.println("No results for your search");
                 } else {
                     System.out.println("Search results:");
-                    printAllTickets(results);
+                    printAllTickets(results,"matching");
                 }
-
-
             } else if (task == 5) {
-                printAllTickets(ticketQueue);
+                // Print all tickets
+                printAllTickets(ticketQueue,"open");
+                printAllTickets(resolvedTickets,"resolved");
             } else if ( task == 6 ) {
                 //Quit. Future prototype may want to save all tickets to a file
                 System.out.println("Quitting program");
                 break;
             }
-            else {
-                //this will happen for 3 or any other selection that is a valid int
-                //Default will be print all tickets
-                printAllTickets(ticketQueue);
-            }
+            // Any other number ignored, just brings up menu again
         }
-
+        // Clean up (close scanner)
         scanner.close();
-
     }
 
-    private static String getStringInput() {
-        String input = scanner.nextLine();
-        return input;
-    }
 
+
+    /* Gets a list of tickets that have a searched string in their description */
     private static LinkedList<Ticket> searchByName(LinkedList<Ticket> ticketQueue) {
 
         System.out.println("Enter search query:");
-        String query = getStringInput();
+        String query = getStringInput().toLowerCase();
 
         LinkedList<Ticket> searchResults = new LinkedList<Ticket>();
 
         for (Ticket ticket : ticketQueue) {
-            if (ticket.getDescription().contains(query)) {
+            String desc = ticket.getDescription().toLowerCase();
+            if (desc.contains(query)) {
                 searchResults.add(ticket);
             }
         }
 
         return searchResults;
 
-
-
     }
 
-    protected static void deleteTicketByID(LinkedList<Ticket> ticketQueue) {
-        printAllTickets(ticketQueue);   //display list for user
+    /* Deletes tickets, identified by their Ticket ID */
+    protected static void deleteTicketByID(LinkedList<Ticket> ticketQueue,LinkedList<Ticket> resolvedTickets) {
+        printAllTickets(ticketQueue,"open");   //display list for user
 
         if (ticketQueue.size() == 0) {    //no tickets!
             System.out.println("No tickets to delete!\n");
@@ -101,7 +110,16 @@ public class TicketManager {
             for (Ticket ticket : ticketQueue) {
                 if (ticket.getTicketID() == deleteID) {
                     found = true;
+                    System.out.println("Ticket " + ticket.getTicketID() + ": " + ticket);
+                    System.out.println("Enter resolution: ");
+                    String resolution = getStringInput();
+                    // Add resolved variables
+                    ticket.setResolution(resolution);
+                    ticket.setDateResolved(new Date());
+                    // Remove from ticketQueue and add to resolvedTickets
                     ticketQueue.remove(ticket);
+                    resolvedTickets.add(ticket);
+                    // Output to console
                     System.out.println(String.format("Ticket %d deleted", deleteID));
                     break; //don't need loop any more.
                 }
@@ -111,34 +129,34 @@ public class TicketManager {
                 int response = 0;
                 while (response < 1 || response > 2) {
                     System.out.println("Enter another ticket ID?");
-                    System.out.println("1. Yes");
-                    System.out.println("2. No");
+                    System.out.println("1. Yes\n2. No");
                     response = getPositiveIntInput();
                     if (response < 1 || response > 2) {
                         System.out.println("Please enter 1 or 2");
+                    } else if (response == 2) {
+                        found = true;
                     }
                 }
-
-
             }
         }
 
-        printAllTickets(ticketQueue);  //print updated list
+        printAllTickets(ticketQueue,"open");  //print updated list
     }
 
-    protected static void printAllTickets(LinkedList<Ticket> tickets) {
-        System.out.println(" ------- All open tickets ----------");
+    /* Prints all tickets, either Open or Resolved */
+    protected static void printAllTickets(LinkedList<Ticket> tickets, String ticketType) {
+        System.out.println(" ------- All " + ticketType + " tickets ----------");
 
         for (Ticket t : tickets ) {
-            System.out.println(t); //Write a toString method in Ticket class
+            System.out.println(t);
             //println will try to call toString on its argument
         }
         System.out.println(" ------- End of ticket list ----------");
 
     }
 
+    /* Adds tickets to the ticket queue */
     protected static void addTickets(LinkedList<Ticket> ticketQueue) {
-        Scanner sc = new Scanner(System.in);
         boolean moreProblems = true;
         String description, reporter;
         Date dateReported = new Date(); //Default constructor creates date with current date/time
@@ -146,26 +164,27 @@ public class TicketManager {
 
         while (moreProblems){
             System.out.println("Enter problem");
-            description = sc.nextLine();
+            description = getStringInput();
             System.out.println("Who reported this issue?");
-            reporter = sc.nextLine();
+            reporter = getStringInput();
             System.out.println("Enter priority of " + description);
-            priority = Integer.parseInt(sc.nextLine());
+            priority = getPositiveIntInput();
 
             Ticket t = new Ticket(description, priority, reporter, dateReported);
-            //ticketQueue.add(t);
             addTicketInPriorityOrder(ticketQueue, t);
 
-            printAllTickets(ticketQueue);
+            printAllTickets(ticketQueue,"open");
 
             System.out.println("More tickets to add? (enter N for no)");
-            String more = sc.nextLine();
+            String more = getStringInput();
             if (more.equalsIgnoreCase("N")) {
                 moreProblems = false;
             }
         }
     }
 
+
+    /* Adds tickets in order of priority, or fits a ticket in the right location */
     protected static void addTicketInPriorityOrder(LinkedList<Ticket> tickets, Ticket newTicket){
 
         //Logic: assume the list is either empty or sorted
@@ -230,6 +249,11 @@ public class TicketManager {
         }
 
         return userNumber;
+    }
+
+    private static String getStringInput() {
+        String input = scanner.nextLine();
+        return input;
     }
 
 }
