@@ -1,5 +1,6 @@
 package com.andrew;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 public class Ticket {
@@ -10,11 +11,14 @@ public class Ticket {
     private Date dateReported;
     private String resolution;
     private Date dateResolved;
+    private DateFormat df = DateFormat.getDateInstance();
+
 
     //STATIC Counter - accessible to all Ticket objects.
     //If any Ticket object modifies this counter, all Ticket objects will have the modified value
     //Make it private - only Ticket objects should have access
-    private static int staticTicketIDCounter = 1;
+    protected static int staticTicketIDCounter = 1;
+    protected final static String REPORT_SEP = ";";
     //The ID for each ticket - instance variable. Each Ticket will have it's own ticketID variable
     protected int ticketID;
 
@@ -56,15 +60,34 @@ public class Ticket {
         return dateReported;
     }
 
-    public String toString(){
-        String printStr = "ID= " + this.ticketID + " | Issued: " + this.description + " | Priority: " + this.priority + " | Reported by: "
-                + this.reporter + " | Reported on: " + this.dateReported;
+    protected boolean isResolved() {
+        if (resolution.equals("unresolved")) {
+            return false;
+        } else return true;
+    }
 
-        if (!this.resolution.equalsIgnoreCase("unresolved")) {
-            printStr += " | Resolution: " + this.resolution + " | Resolved on: " + this.dateResolved;
+
+    public String toString() {
+        String printStr = "ID= " + this.ticketID + " | Issue: " + this.description + " | Priority: " + this.priority + " | Reported by: "
+                + this.reporter + " | Reported on: " + df.format(this.dateReported);
+
+        if (isResolved()) {
+            printStr += " / Resolution: " + this.resolution + " | Resolved on: " + this.dateResolved;
         }
 
         return printStr;
+    }
+
+    public String fileFormatStr() {
+        String formattedStr = this.description + REPORT_SEP + this.priority + REPORT_SEP + this.reporter + REPORT_SEP + df.format(this.dateReported);
+
+        if (isResolved()) {
+            formattedStr += REPORT_SEP + this.resolution + REPORT_SEP + this.dateResolved;
+        }
+
+        return formattedStr;
+
+
     }
 
 

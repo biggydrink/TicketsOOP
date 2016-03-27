@@ -1,5 +1,8 @@
 package com.andrew;
 
+import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.*;
 
 public class TicketManager {
@@ -11,7 +14,16 @@ public class TicketManager {
         LinkedList<Ticket> ticketQueue = new LinkedList<>();
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
-        scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in); // global scanner
+
+        File savedTicketsFile = new File("open_tickets.txt");
+        if (savedTicketsFile.exists() && !savedTicketsFile.isDirectory()) {
+            ticketQueue = readTickets(savedTicketsFile,ticketQueue);
+        }
+
+        /*
+
+        un-comment for testing purposes
 
         Ticket ticket1 = new Ticket("Big Fire!",5,"Andrew",new Date());
         Ticket ticket2 = new Ticket("Small fire",3,"Andrew",new Date());
@@ -26,6 +38,8 @@ public class TicketManager {
         ticketQueue.add(ticket4);
         ticketQueue.add(ticket5);
         ticketQueue.add(ticket6);
+
+        */
 
         while(true){
 
@@ -67,10 +81,67 @@ public class TicketManager {
             }
             // Any other number ignored, just brings up menu again
         }
-        // Clean up (close scanner)
+
+        // Clean up (save tickets & close scanner)
+        System.out.println("Saving tickets..");
+        saveTickets(ticketQueue,"open_tickets.txt");
+        Calendar today = Calendar.getInstance();
+        String resolvedFileName = "Resolved_tickets_" +
+                (today.get(Calendar.MONTH)+1) + "." + today.get(Calendar.DAY_OF_MONTH) + "." + today.get(Calendar.YEAR) + ".txt";
+        saveTickets(resolvedTickets,resolvedFileName);
         scanner.close();
     }
 
+    private static LinkedList<Ticket> readTickets(File fileName, LinkedList<Ticket> ticketQueue) {
+
+        DateFormat df = DateFormat.getDateInstance();
+        try {
+            BufferedReader bufReader = new BufferedReader(new FileReader(fileName));
+            // Import ticket counter (top of open tickets file)
+            String topLine = bufReader.readLine();
+            Ticket.staticTicketIDCounter = Integer.parseInt(topLine);
+            // Loop through remaining tickets in file and add to ticketQueue
+            for (String line = bufReader.readLine(); line != null; line = bufReader.readLine()) {
+                String[] params = line.split(Ticket.REPORT_SEP);
+
+                String description = params[0];
+                int priority = Integer.parseInt(params[1]);
+                String reporter = params[2];
+                try {
+                    Date createDate = df.parse(params[3]);
+                    ticketQueue.add(new Ticket(description,priority,reporter,createDate));
+                } catch (ParseException pe) {
+                    System.out.println("Error loading date from ticket " + description);
+                    System.out.println("Adding ticket with today's date");
+                    ticketQueue.add(new Ticket(description,priority,reporter,new Date()));
+                }
+            }
+        } catch (IOException ioe) {
+            //System.out.println("Error loading ticket queue from " + fileName + ": " + ioe);
+        }
+
+        return ticketQueue;
+    }
+
+    private static void saveTickets(LinkedList<Ticket> ticketQueue,String fileName) {
+
+        try {
+            BufferedWriter bufWriter = new BufferedWriter(new FileWriter(fileName));
+            if (fileName.equals("open_tickets.txt")) {
+                bufWriter.write(Integer.toString(Ticket.staticTicketIDCounter));
+                bufWriter.newLine();
+            }
+            for (Ticket ticket : ticketQueue) {
+                bufWriter.write(ticket.fileFormatStr());
+                bufWriter.newLine();
+            }
+            bufWriter.close();
+        } catch (IOException ioe) {
+            System.out.println("Error saving tickets: " + ioe);
+        }
+
+
+    }
 
 
     /* Gets a list of tickets that have a searched string in their description */
@@ -221,25 +292,6 @@ public class TicketManager {
             try {
                 userInput = scanner.nextLine();
                 userNumber = Integer.parseInt(userInput);
-                if (userNumber < 0) {
-                    System.out.println("Please enter a positive number");
-                }
-            } catch (NumberFormatException nfe) {
-                System.out.println("Please enter a number");
-            }
-        }
-
-        return userNumber;
-    }
-
-    public static double getPositiveDoubleInput() {
-        String userInput;
-        double userNumber = -1;
-
-        while (userNumber < 0) {
-            try {
-                userInput = scanner.nextLine();
-                userNumber = Double.parseDouble(userInput);
                 if (userNumber < 0) {
                     System.out.println("Please enter a positive number");
                 }
