@@ -7,6 +7,8 @@ import java.util.*;
 
 public class TicketManager {
 
+    // Gonna be a GUI
+
     public static Scanner scanner;
 
     public static void main(String[] args) {
