@@ -6,9 +6,10 @@ import java.util.Date;
 public class Ticket {
 
     private int priority;
-    private String reporter; //Stores person or department who reported issue
+    private String caller; //Stores person or department who reported issue
     private String description;
     private Date dateReported;
+    private boolean resolved;
     private String resolution;
     private Date dateResolved;
     private DateFormat df = DateFormat.getDateInstance();
@@ -22,11 +23,12 @@ public class Ticket {
     //The ID for each ticket - instance variable. Each Ticket will have it's own ticketID variable
     protected int ticketID;
 
-    public Ticket(String desc, int p, String rep, Date date) {
+    public Ticket(String desc, int p, String rep) {
         this.description = desc;
         this.priority = p;
-        this.reporter = rep;
-        this.dateReported = date;
+        this.caller = rep;
+        this.dateReported = new Date();
+        this.resolved = false;
         this.resolution = "unresolved";
         this.ticketID = staticTicketIDCounter;
         staticTicketIDCounter++;
@@ -34,6 +36,7 @@ public class Ticket {
 
     protected void setResolution(String resolution) {
         this.resolution = resolution;
+        this.resolved = true;
     }
 
     protected void setDateResolved(Date dateResolved) {
@@ -52,8 +55,8 @@ public class Ticket {
         return description;
     }
 
-    protected String getReporter() {
-        return reporter;
+    protected String getCaller() {
+        return caller;
     }
 
     protected Date getDateReported() {
@@ -69,7 +72,7 @@ public class Ticket {
 
     public String toString() {
         String printStr = "ID= " + this.ticketID + " | Issue: " + this.description + " | Priority: " + this.priority + " | Reported by: "
-                + this.reporter + " | Reported on: " + df.format(this.dateReported);
+                + this.caller + " | Reported on: " + df.format(this.dateReported);
 
         if (isResolved()) {
             printStr += " / Resolution: " + this.resolution + " | Resolved on: " + this.dateResolved;
@@ -79,7 +82,7 @@ public class Ticket {
     }
 
     public String fileFormatStr() {
-        String formattedStr = this.description + REPORT_SEP + this.priority + REPORT_SEP + this.reporter + REPORT_SEP + df.format(this.dateReported);
+        String formattedStr = this.description + REPORT_SEP + this.priority + REPORT_SEP + this.caller + REPORT_SEP + df.format(this.dateReported);
 
         if (isResolved()) {
             formattedStr += REPORT_SEP + this.resolution + REPORT_SEP + this.dateResolved;

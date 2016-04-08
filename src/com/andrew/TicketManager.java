@@ -7,16 +7,14 @@ import java.util.*;
 
 public class TicketManager {
 
-    // Gonna be a GUI
-
     public static Scanner scanner;
 
     public static void main(String[] args) {
 
+        TicketGUI ticketGUI = new TicketGUI();
+
         LinkedList<Ticket> ticketQueue = new LinkedList<>();
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
-
-        scanner = new Scanner(System.in); // global scanner
 
         File savedTicketsFile = new File("open_tickets.txt");
         if (savedTicketsFile.exists() && !savedTicketsFile.isDirectory()) {
@@ -42,7 +40,7 @@ public class TicketManager {
         ticketQueue.add(ticket6);
 
         */
-
+        /*
         while(true){
 
             System.out.println("1. Enter Ticket\n2. Delete Ticket by ID\n3. Delete Ticket by Issue\n4. Search by Name\n5. Display All Tickets\n6. Quit");
@@ -83,6 +81,7 @@ public class TicketManager {
             }
             // Any other number ignored, just brings up menu again
         }
+        */
 
         // Clean up (save tickets & close scanner)
         System.out.println("Saving tickets..");
@@ -93,6 +92,7 @@ public class TicketManager {
         saveTickets(resolvedTickets,resolvedFileName);
         scanner.close();
     }
+
 
     private static LinkedList<Ticket> readTickets(File fileName, LinkedList<Ticket> ticketQueue) {
 
@@ -111,11 +111,11 @@ public class TicketManager {
                 String reporter = params[2];
                 try {
                     Date createDate = df.parse(params[3]);
-                    ticketQueue.add(new Ticket(description,priority,reporter,createDate));
+                    ticketQueue.add(new Ticket(description,priority,reporter));
                 } catch (ParseException pe) {
                     System.out.println("Error loading date from ticket " + description);
                     System.out.println("Adding ticket with today's date");
-                    ticketQueue.add(new Ticket(description,priority,reporter,new Date()));
+                    ticketQueue.add(new Ticket(description,priority,reporter));
                 }
             }
         } catch (IOException ioe) {
@@ -228,33 +228,7 @@ public class TicketManager {
 
     }
 
-    /* Adds tickets to the ticket queue */
-    protected static void addTickets(LinkedList<Ticket> ticketQueue) {
-        boolean moreProblems = true;
-        String description, reporter;
-        Date dateReported = new Date(); //Default constructor creates date with current date/time
-        int priority;
 
-        while (moreProblems){
-            System.out.println("Enter problem");
-            description = getStringInput();
-            System.out.println("Who reported this issue?");
-            reporter = getStringInput();
-            System.out.println("Enter priority of " + description);
-            priority = getPositiveIntInput();
-
-            Ticket t = new Ticket(description, priority, reporter, dateReported);
-            addTicketInPriorityOrder(ticketQueue, t);
-
-            printAllTickets(ticketQueue,"open");
-
-            System.out.println("More tickets to add? (enter N for no)");
-            String more = getStringInput();
-            if (more.equalsIgnoreCase("N")) {
-                moreProblems = false;
-            }
-        }
-    }
 
 
     /* Adds tickets in order of priority, or fits a ticket in the right location */
