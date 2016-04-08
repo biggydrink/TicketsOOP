@@ -7,9 +7,12 @@ import java.util.*;
 
 public class TicketManager {
 
+    //Here are some comments in the class
+
     public static Scanner scanner;
 
     public static void main(String[] args) {
+        TicketGUI ticketGUI = new TicketGUI();
 
         LinkedList<Ticket> ticketQueue = new LinkedList<>();
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
@@ -228,30 +231,30 @@ public class TicketManager {
 
     /* Adds tickets to the ticket queue */
     protected static void addTickets(LinkedList<Ticket> ticketQueue) {
-        boolean moreProblems = true;
-        String description, reporter;
-        Date dateReported = new Date(); //Default constructor creates date with current date/time
-        int priority;
-
-        while (moreProblems){
-            System.out.println("Enter problem");
-            description = getStringInput();
-            System.out.println("Who reported this issue?");
-            reporter = getStringInput();
-            System.out.println("Enter priority of " + description);
-            priority = getPositiveIntInput();
-
-            Ticket t = new Ticket(description, priority, reporter, dateReported);
-            addTicketInPriorityOrder(ticketQueue, t);
-
-            printAllTickets(ticketQueue,"open");
-
-            System.out.println("More tickets to add? (enter N for no)");
-            String more = getStringInput();
-            if (more.equalsIgnoreCase("N")) {
-                moreProblems = false;
-            }
-        }
+//        boolean moreProblems = true;
+//        String description, reporter;
+//        Date dateReported = new Date(); //Default constructor creates date with current date/time
+//        int priority;
+//
+//        while (moreProblems){
+//            System.out.println("Enter problem");
+//            description = getStringInput();
+//            System.out.println("Who reported this issue?");
+//            reporter = getStringInput();
+//            System.out.println("Enter priority of " + description);
+//            priority = getPositiveIntInput();
+//
+//            Ticket t = new Ticket(description, priority, reporter, dateReported);
+//            addTicketInPriorityOrder(ticketQueue, t);
+//
+//            printAllTickets(ticketQueue,"open");
+//
+//            System.out.println("More tickets to add? (enter N for no)");
+//            String more = getStringInput();
+//            if (more.equalsIgnoreCase("N")) {
+//                moreProblems = false;
+//            }
+//        }
     }
 
 
