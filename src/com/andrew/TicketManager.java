@@ -7,18 +7,20 @@ import java.util.*;
 
 public class TicketManager {
 
-    public static Scanner scanner;
+    public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
 
         TicketGUI ticketGUI = new TicketGUI();
 
-        LinkedList<Ticket> ticketQueue = new LinkedList<>();
+
+
+        LinkedList<Ticket> openTickets = new LinkedList<>();
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
         File savedTicketsFile = new File("open_tickets.txt");
         if (savedTicketsFile.exists() && !savedTicketsFile.isDirectory()) {
-            ticketQueue = readTickets(savedTicketsFile,ticketQueue);
+            openTickets = readTickets(savedTicketsFile,openTickets);
         }
 
         /*
@@ -32,12 +34,12 @@ public class TicketManager {
         Ticket ticket5 = new Ticket("Squirt gun (water)",2,"Andrew",new Date());
         Ticket ticket6 = new Ticket("Spilled drink (water)",4,"Andrew",new Date());
 
-        ticketQueue.add(ticket1);
-        ticketQueue.add(ticket2);
-        ticketQueue.add(ticket3);
-        ticketQueue.add(ticket4);
-        ticketQueue.add(ticket5);
-        ticketQueue.add(ticket6);
+        openTickets.add(ticket1);
+        openTickets.add(ticket2);
+        openTickets.add(ticket3);
+        openTickets.add(ticket4);
+        openTickets.add(ticket5);
+        openTickets.add(ticket6);
 
         */
         /*
@@ -48,21 +50,21 @@ public class TicketManager {
 
             if (task == 1) {
                 // Call addTickets, which will let us enter any number of new tickets
-                addTickets(ticketQueue);
+                addTickets(openTickets);
 
             } else if (task == 2) {
                 // Delete a ticket by ID
-                deleteTicketByID(ticketQueue,resolvedTickets);
+                deleteTicketByID(openTickets,resolvedTickets);
             } else if (task == 3) {
                 // Delete a ticket by issue (search, then show results and option to delete)
                 LinkedList<Ticket> results;
-                results = searchByName(ticketQueue);
+                results = searchByName(openTickets);
 
                 deleteTicketByID(results,resolvedTickets);
             } else if (task == 4) {
                 // Search descriptions of tickets
                 LinkedList<Ticket> results;
-                results = searchByName(ticketQueue);
+                results = searchByName(openTickets);
 
                 if (results.isEmpty()) {
                     System.out.println("No results for your search");
@@ -72,7 +74,7 @@ public class TicketManager {
                 }
             } else if (task == 5) {
                 // Print all tickets
-                printAllTickets(ticketQueue,"open");
+                printAllTickets(openTickets,"open");
                 printAllTickets(resolvedTickets,"resolved");
             } else if ( task == 6 ) {
                 //Quit. Future prototype may want to save all tickets to a file
@@ -81,16 +83,18 @@ public class TicketManager {
             }
             // Any other number ignored, just brings up menu again
         }
-        */
+
 
         // Clean up (save tickets & close scanner)
         System.out.println("Saving tickets..");
-        saveTickets(ticketQueue,"open_tickets.txt");
+        saveTickets(openTickets,"open_tickets.txt");
         Calendar today = Calendar.getInstance();
         String resolvedFileName = "Resolved_tickets_" +
                 (today.get(Calendar.MONTH)+1) + "." + today.get(Calendar.DAY_OF_MONTH) + "." + today.get(Calendar.YEAR) + ".txt";
         saveTickets(resolvedTickets,resolvedFileName);
         scanner.close();
+
+        */
     }
 
 
@@ -119,7 +123,7 @@ public class TicketManager {
                 }
             }
         } catch (IOException ioe) {
-            //System.out.println("Error loading ticket queue from " + fileName + ": " + ioe);
+            System.out.println("Error loading ticket queue from " + fileName + ": " + ioe);
         }
 
         return ticketQueue;
@@ -147,10 +151,10 @@ public class TicketManager {
 
 
     /* Gets a list of tickets that have a searched string in their description */
-    private static LinkedList<Ticket> searchByName(LinkedList<Ticket> ticketQueue) {
+    protected static LinkedList<Ticket> searchByName(LinkedList<Ticket> ticketQueue,String query) {
 
-        System.out.println("Enter search query:");
-        String query = getStringInput().toLowerCase();
+        //System.out.println("Enter search query:");
+        //String query = getStringInput().toLowerCase();
 
         LinkedList<Ticket> searchResults = new LinkedList<Ticket>();
 

@@ -1,17 +1,14 @@
 package com.andrew;
 
-import com.andrew.Ticket;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
 import java.util.LinkedList;
 
 
 public class TicketGUI extends JFrame {
-    private JList ticketList;
+    private JList<Ticket> ticketList;
     private JButton enterTicketButton;
     private JPanel rootPanel;
     public JTextField enterTicketIssueTextField;
@@ -30,18 +27,19 @@ public class TicketGUI extends JFrame {
 
     private DefaultListModel<Ticket> listModel;
 
-    LinkedList<Ticket> ticketQueue = new LinkedList<>();
+    LinkedList<Ticket> openTickets = new LinkedList<>();
     LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
 
     public TicketGUI() {
         super("Ticket Manager");
         setContentPane(rootPanel);
-        setPreferredSize(new Dimension(700,700));
+        setPreferredSize(new Dimension(1400,700));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         listModel = new DefaultListModel<Ticket>();
         ticketList.setModel(listModel);
+        ticketList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Can only select one item at a time
 
         addListeners();
 
@@ -59,13 +57,11 @@ public class TicketGUI extends JFrame {
                 String caller = enterTicketCallerTextField.getText();
                 int priority;
 
-
                 try {
                     priority = Integer.parseInt(enterTicketPriorityTextField.getText());
                     enterTicketPriorityLabel.setText("Priority: ");
                     Ticket t = new Ticket(description, priority, caller);
-                    ticketQueue.add(t);
-                    listModel.addElement(t);
+                    openTickets.add(t);
 
                     // Reset text fields
                     enterTicketIssueTextField.setText("");
@@ -75,6 +71,8 @@ public class TicketGUI extends JFrame {
                     enterTicketPriorityLabel.setText("Please enter a number from 1-5");
                 }
 
+                populateModel(openTickets);
+
             }
 
 
@@ -83,8 +81,19 @@ public class TicketGUI extends JFrame {
         resolveTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Resolve a selected ticket
+                String resolution = resolveTicketResolutionTextField.getText();
+                Ticket newResolvedTicket = ticketList.getSelectedValue();
+
+                // Set resolution for selected ticket
+                newResolvedTicket.setResolution(resolution);
+
                 // Remove from open ticket list and add to resolved ticket list
+                openTickets.remove(newResolvedTicket);
+                resolvedTickets.add(newResolvedTicket);
+
+                // Show open tickets only in list (aka remove new resolved ticket from current view)
+                populateModel(openTickets);
+
             }
         });
 
@@ -92,29 +101,35 @@ public class TicketGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Search tickets
+                String query = searchTicketTextField.getText();
+                LinkedList<Ticket> searchResults = TicketManager.searchByName(openTickets,query);
+
                 // Show them in the list
+                populateModel(searchResults);
             }
         });
 
         viewOpenTicketsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // populate list with all open tickets
+                populateModel(openTickets);
             }
         });
 
         viewResolvedTicketsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                populateModel(resolvedTickets);
             }
         });
 
     }
 
 
-    /* Adds a ticket to the ticket queue */
-    protected void addTicket() {
-
+    protected void populateModel(LinkedList<Ticket> ticketList) {
+        listModel.clear();
+        for (Ticket ticket : ticketList) {
+            listModel.addElement(ticket);
+        }
     }
 }
