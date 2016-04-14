@@ -27,9 +27,6 @@ public class TicketGUI extends JFrame {
 
     private DefaultListModel<Ticket> listModel;
 
-    LinkedList<Ticket> openTickets = new LinkedList<>();
-    LinkedList<Ticket> resolvedTickets = new LinkedList<>();
-
 
     public TicketGUI() {
         super("Ticket Manager");
@@ -42,9 +39,12 @@ public class TicketGUI extends JFrame {
         ticketList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Can only select one item at a time
 
         addListeners();
+        addWindowListener(new WindowClosingListener());
 
         pack();
         setVisible(true);
+
+        populateModel(TicketManager.openTickets);
 
     }
 
@@ -61,7 +61,7 @@ public class TicketGUI extends JFrame {
                     priority = Integer.parseInt(enterTicketPriorityTextField.getText());
                     enterTicketPriorityLabel.setText("Priority: ");
                     Ticket t = new Ticket(description, priority, caller);
-                    openTickets.add(t);
+                    TicketManager.openTickets.add(t);
 
                     // Reset text fields
                     enterTicketIssueTextField.setText("");
@@ -71,7 +71,7 @@ public class TicketGUI extends JFrame {
                     enterTicketPriorityLabel.setText("Please enter a number from 1-5");
                 }
 
-                populateModel(openTickets);
+                populateModel(TicketManager.openTickets);
 
             }
 
@@ -88,11 +88,11 @@ public class TicketGUI extends JFrame {
                 newResolvedTicket.setResolution(resolution);
 
                 // Remove from open ticket list and add to resolved ticket list
-                openTickets.remove(newResolvedTicket);
-                resolvedTickets.add(newResolvedTicket);
+                TicketManager.openTickets.remove(newResolvedTicket);
+                TicketManager.resolvedTickets.add(newResolvedTicket);
 
                 // Show open tickets only in list (aka remove new resolved ticket from current view)
-                populateModel(openTickets);
+                populateModel(TicketManager.openTickets);
 
             }
         });
@@ -102,7 +102,7 @@ public class TicketGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Search tickets
                 String query = searchTicketTextField.getText();
-                LinkedList<Ticket> searchResults = TicketManager.searchByName(openTickets,query);
+                LinkedList<Ticket> searchResults = TicketManager.searchByName(TicketManager.openTickets,query);
 
                 // Show them in the list
                 populateModel(searchResults);
@@ -112,14 +112,14 @@ public class TicketGUI extends JFrame {
         viewOpenTicketsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                populateModel(openTickets);
+                populateModel(TicketManager.openTickets);
             }
         });
 
         viewResolvedTicketsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                populateModel(resolvedTickets);
+                populateModel(TicketManager.resolvedTickets);
             }
         });
 
