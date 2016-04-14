@@ -99,8 +99,7 @@ public class TicketManager {
     /* Gets a list of tickets that have a searched string in their description */
     protected static LinkedList<Ticket> searchByName(LinkedList<Ticket> ticketQueue, String query) {
 
-        //System.out.println("Enter search query:");
-        //String query = getStringInput().toLowerCase();
+        query = query.toLowerCase();
 
         LinkedList<Ticket> searchResults = new LinkedList<Ticket>();
 
